@@ -177,13 +177,6 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>"$(SolutionDir)..\..\..\Tools\gacutil" -f -i "$(TargetPath)"
-
-if $(ConfigurationName) == Release (
-xcopy /q /y "$(TargetPath)" "$(SolutionDir)..\..\..\Deployment\Bin"
-REM "$(SolutionDir)..\..\..\Deployment\Bin\MkDynamic" "$(TargetFileName)" "$(SolutionDir)..\..\..\Deployment\Dynamic"
-)
-if $(ConfigurationName) == Debug (
-xcopy /q /y "$(TargetDir)$(TargetName).*" "$(SolutionDir)..\..\..\Deployment\Debug")</PostBuildEvent>
+    <PostBuildEvent>"$(ProjectDir)..\..\Tools\gacutil" -f -i "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
