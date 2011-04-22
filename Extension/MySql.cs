@@ -1172,7 +1172,7 @@ namespace PHP.Library.Data
         
         PhpBytes bytes = value as PhpBytes;
         if (bytes != null)
-          array.Add(bytes.Data.Length); 
+          array.Add(bytes.Length); 
         else if (value != null)
           array.Add(value.ToString().Length); 
         else
