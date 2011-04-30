@@ -1119,34 +1119,42 @@ namespace PHP.Library.Data
 
       return FetchFieldInternal(result, fieldIndex);
     }
-    
+
     private static PhpObject FetchFieldInternal(PhpMyDbResult/*!*/ result, int fieldIndex)
     {
-      DataRow info = result.GetSchemaRowInfo(fieldIndex);
-      if (info == null) return null;
-			
-      string s;
-      PhpObject obj = new stdClass();
-      //ColumnFlags flags = result.GetFieldFlags(fieldIndex);
-      string php_type = result.GetPhpFieldType(fieldIndex);
-      
-      obj.Add("name",result.GetFieldName(fieldIndex));
-      obj.Add("table",(s = info["BaseTableName"] as string) != null ? s : "");
-      obj.Add("def",""); // TODO
-      obj.Add("max_length",result.GetFieldLength(fieldIndex));
+        DataRow info = result.GetSchemaRowInfo(fieldIndex);
+        if (info == null) return null;
 
-      obj.Add("not_null",/*(flags & ColumnFlags.NOT_NULL) != 0*/ (!(bool)info["AllowDBNull"]) ? 1 : 0);
-      obj.Add("primary_key",/*(flags & ColumnFlags.PRIMARY_KEY) != 0*/ ((bool)info["IsKey"]) ? 1 : 0);
-      obj.Add("multiple_key",/*(flags & ColumnFlags.MULTIPLE_KEY) != 0*/ ((bool)info["IsMultipleKey"]) ? 1 : 0);
-      obj.Add("unique_key",/*(flags & ColumnFlags.UNIQUE_KEY) != 0*/ ((bool)info["IsUnique"]) ? 1 : 0);
-      obj.Add("numeric",result.IsNumericType(php_type) ? 1 : 0);
-      obj.Add("blob",/*(flags & ColumnFlags.BLOB) != 0*/ ((bool)info["IsBlob"]) ? 1 : 0);
-      
-      obj.Add("type",php_type);
-      obj.Add("unsigned",/*(flags & ColumnFlags.UNSIGNED) != 0*/ ((bool)info["IsUnsigned"]) ? 1 : 0);
-      obj.Add("zerofill",/*(flags & ColumnFlags.ZERO_FILL) != 0*/ ((bool)info["ZeroFill"]) ? 1 : 0);
-      
-      return obj;
+        string s;
+        //ColumnFlags flags = result.GetFieldFlags(fieldIndex);
+        string php_type = result.GetPhpFieldType(fieldIndex);
+
+        // create an array of runtime fields with specified capacity:
+        OrderedHashtable<string> objFields = new OrderedHashtable<string>(null, 13);
+
+        // add fields into the hastable directly:
+        // no duplicity check, since array is already valid
+        objFields.Add("name", result.GetFieldName(fieldIndex));
+        objFields.Add("table", (s = info["BaseTableName"] as string) != null ? s : "");
+        objFields.Add("def", ""); // TODO
+        objFields.Add("max_length", result.GetFieldLength(fieldIndex));
+
+        objFields.Add("not_null",/*(flags & ColumnFlags.NOT_NULL) != 0*/ (!(bool)info["AllowDBNull"]) ? 1 : 0);
+        objFields.Add("primary_key",/*(flags & ColumnFlags.PRIMARY_KEY) != 0*/ ((bool)info["IsKey"]) ? 1 : 0);
+        objFields.Add("multiple_key",/*(flags & ColumnFlags.MULTIPLE_KEY) != 0*/ ((bool)info["IsMultipleKey"]) ? 1 : 0);
+        objFields.Add("unique_key",/*(flags & ColumnFlags.UNIQUE_KEY) != 0*/ ((bool)info["IsUnique"]) ? 1 : 0);
+        objFields.Add("numeric", result.IsNumericType(php_type) ? 1 : 0);
+        objFields.Add("blob",/*(flags & ColumnFlags.BLOB) != 0*/ ((bool)info["IsBlob"]) ? 1 : 0);
+
+        objFields.Add("type", php_type);
+        objFields.Add("unsigned",/*(flags & ColumnFlags.UNSIGNED) != 0*/ ((bool)info["IsUnsigned"]) ? 1 : 0);
+        objFields.Add("zerofill",/*(flags & ColumnFlags.ZERO_FILL) != 0*/ ((bool)info["ZeroFill"]) ? 1 : 0);
+
+        // create new stdClass with runtime fields initialized above:
+        return new stdClass()
+        {
+            RuntimeFields = objFields
+        };
     }
     
     /// <summary>
