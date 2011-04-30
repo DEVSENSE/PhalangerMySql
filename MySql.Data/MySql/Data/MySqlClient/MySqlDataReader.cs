@@ -87,7 +87,9 @@
             }
         }
 
-        public ColumnFlags GetFieldFlags(int i) { return resultSet.Fields[i].colFlags; }
+        public ColumnFlags GetFieldFlags(int i) {
+            return resultSet.Fields[i].colFlags;
+        }
 
         public override bool GetBoolean(int i)
         {
@@ -441,6 +443,22 @@
                 throw new IndexOutOfRangeException();
             }
             return this.resultSet.Fields[i].ColumnName;
+        }
+
+        /// <summary>
+        /// resultSet.Fields[i].RealTableName
+        /// </summary>
+        /// <param name="i">field index</param>
+        /// <returns></returns>
+        public string GetRealTableName(int i)
+        {
+            return resultSet.Fields[i].RealTableName;
+        }
+
+        public int GetColumnSize(int i)
+        {
+            MySqlField field = this.resultSet.Fields[i];
+            return field.IsTextField ? (field.ColumnLength / field.MaxLength) : field.ColumnLength;
         }
 
         public override int GetOrdinal(string name)
