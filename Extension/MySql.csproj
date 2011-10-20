@@ -96,13 +96,13 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PhpNetClassLibrary, Version=2.1.0.0, Culture=neutral, PublicKeyToken=4af37afe3cde05fb, processorArchitecture=MSIL">
+    <Reference Include="PhpNetClassLibrary, Version=2.2.0.0, Culture=neutral, PublicKeyToken=4af37afe3cde05fb, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\PhpNetClassLibrary\v4.0_2.1.0.0__4af37afe3cde05fb\PhpNetClassLibrary.dll</HintPath>
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\PhpNetClassLibrary\v4.0_2.2.0.0__4af37afe3cde05fb\PhpNetClassLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="PhpNetCore, Version=2.1.0.0, Culture=neutral, PublicKeyToken=0a8e8c4c76728c71, processorArchitecture=MSIL">
+    <Reference Include="PhpNetCore, Version=2.2.0.0, Culture=neutral, PublicKeyToken=0a8e8c4c76728c71, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\PhpNetCore\v4.0_2.1.0.0__0a8e8c4c76728c71\PhpNetCore.dll</HintPath>
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\PhpNetCore\v4.0_2.2.0.0__0a8e8c4c76728c71\PhpNetCore.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
