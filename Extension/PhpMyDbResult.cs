@@ -150,7 +150,7 @@ namespace PHP.Library.Data
                 return ((uint)sqlValue).ToString();
 
             if (sqlValue is bool)
-                return ((bool)sqlValue).ToString();
+                return (bool)sqlValue;
 
             if (sqlValue is byte)
                 return ((byte)sqlValue).ToString();
