@@ -149,6 +149,9 @@ namespace PHP.Library.Data
             if (sqlValue is uint)
                 return ((uint)sqlValue).ToString();
 
+            if (sqlValue is bool)
+                return ((bool)sqlValue).ToString();
+
             if (sqlValue is byte)
                 return ((byte)sqlValue).ToString();
 
