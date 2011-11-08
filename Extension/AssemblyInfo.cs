@@ -23,7 +23,7 @@ using PHP.Core;
 [assembly: AssemblyCopyright("Copyright (c) 2005-2011 Tomas Matousek, Jakub Misek")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("2.2.0.0")]
+[assembly: AssemblyVersion("3.0.0.0")]
 [assembly: AssemblyDelaySign(false)]
 
 //#if DEBUG
