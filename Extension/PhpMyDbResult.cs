@@ -150,7 +150,7 @@ namespace PHP.Library.Data
                 return ((uint)sqlValue).ToString();
 
             if (sqlValue.GetType() == typeof(bool))
-                return (bool)sqlValue;
+                return (bool)sqlValue ? "1" : "0";
 
             if (sqlValue.GetType() == typeof(byte))
                 return ((byte)sqlValue).ToString();
@@ -165,7 +165,7 @@ namespace PHP.Library.Data
                 return ((ushort)sqlValue).ToString();
 
             if (sqlValue.GetType() == typeof(float))
-                return (double)(float)sqlValue;
+                return Core.Convert.DoubleToString((float)sqlValue);
 
             if (sqlValue.GetType() == typeof(DateTime))
                 return ConvertDateTime(dataType, (DateTime)sqlValue);
