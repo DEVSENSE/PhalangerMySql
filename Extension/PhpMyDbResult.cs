@@ -134,60 +134,59 @@ namespace PHP.Library.Data
         /// <returns>PHP value.</returns>
         private object ConvertDbValue(string dataType, object sqlValue)
         {
-            if (sqlValue is string || sqlValue == null)
+            if (sqlValue == null || sqlValue.GetType() == typeof(string))
                 return sqlValue;
 
-            if (sqlValue is double)
+            if (sqlValue.GetType() == typeof(double))
                 return Core.Convert.DoubleToString((double)sqlValue);
 
             if (sqlValue == System.DBNull.Value)
                 return null;
 
-            if (sqlValue is int)
+            if (sqlValue.GetType() == typeof(int))
                 return ((int)sqlValue).ToString();
 
-            if (sqlValue is uint)
+            if (sqlValue.GetType() == typeof(uint))
                 return ((uint)sqlValue).ToString();
 
-            if (sqlValue is bool)
+            if (sqlValue.GetType() == typeof(bool))
                 return (bool)sqlValue;
 
-            if (sqlValue is byte)
+            if (sqlValue.GetType() == typeof(byte))
                 return ((byte)sqlValue).ToString();
 
-            if (sqlValue is sbyte)
+            if (sqlValue.GetType() == typeof(sbyte))
                 return ((sbyte)sqlValue).ToString();
 
-            if (sqlValue is short)
+            if (sqlValue.GetType() == typeof(short))
                 return ((short)sqlValue).ToString();
 
-            if (sqlValue is ushort)
+            if (sqlValue.GetType() == typeof(ushort))
                 return ((ushort)sqlValue).ToString();
 
-            if (sqlValue is float)
+            if (sqlValue.GetType() == typeof(float))
                 return (double)(float)sqlValue;
 
-            if (sqlValue is DateTime)
+            if (sqlValue.GetType() == typeof(DateTime))
                 return ConvertDateTime(dataType, (DateTime)sqlValue);
 
-            if (sqlValue is long)
+            if (sqlValue.GetType() == typeof(long))
                 return ((long)sqlValue).ToString();
 
-            if (sqlValue is ulong)
+            if (sqlValue.GetType() == typeof(ulong))
                 return ((ulong)sqlValue).ToString();
 
-            if (sqlValue is TimeSpan)
+            if (sqlValue.GetType() == typeof(TimeSpan))
                 return ((TimeSpan)sqlValue).ToString();
 
-            if (sqlValue is decimal)
+            if (sqlValue.GetType() == typeof(decimal))
                 return ((decimal)sqlValue).ToString();
 
-            byte[] bytes;
-            if ((bytes = sqlValue as byte[]) != null)
-                return new PhpBytes(bytes);
+            if (sqlValue.GetType() == typeof(byte[]))
+                return new PhpBytes((byte[])sqlValue);
 
             //MySqlDateTime sql_date_time = sqlValue as MySqlDateTime;
-            if (sqlValue is MySqlDateTime)
+            if (sqlValue.GetType() == typeof(MySqlDateTime))
             {
                 MySqlDateTime sql_date_time = (MySqlDateTime)sqlValue;
                 if (sql_date_time.IsValidDateTime)
