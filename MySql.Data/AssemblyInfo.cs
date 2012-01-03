@@ -16,4 +16,4 @@
 [assembly: System.Reflection.AssemblyCompany("Oracle")]
 [assembly: System.Reflection.AssemblyProduct("")]
 [assembly: System.Reflection.AssemblyCopyright("Copyright (c) 2004, 2010, Oracle and/or its affiliates. All rights reserved.")]
-
+[assembly: System.Security.SecurityRules(System.Security.SecurityRuleSet.Level1)]
