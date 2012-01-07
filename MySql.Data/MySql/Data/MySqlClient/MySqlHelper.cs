@@ -6,10 +6,11 @@
 
     public sealed class MySqlHelper
     {
+        private const string stringOfBackslashChars = "\\\x00a5Š₩∖﹨＼";
+        private const string stringOfQuoteChars = "'`\x00b4ʹʺʻʼˈˊˋ˙̀́‘’‚′‵❛❜＇";
+        
         private static CharClass[] charClassArray = makeCharClassArray();
-        private static string stringOfBackslashChars = "\\\x00a5Š₩∖﹨＼";
-        private static string stringOfQuoteChars = "'`\x00b4ʹʺʻʼˈˊˋ˙̀́‘’‚′‵❛❜＇";
-
+        
         private MySqlHelper()
         {
         }

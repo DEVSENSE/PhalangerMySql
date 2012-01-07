@@ -55,8 +55,15 @@ namespace PHP.Library.Data
 
 		internal static PhpMyDbConnection ValidConnection(PhpResource handle)
 		{
-			PhpMyDbConnection connection = handle as PhpMyDbConnection;
-			if (connection != null && connection.IsValid) return connection;
+			PhpMyDbConnection connection;
+
+            if (handle != null && handle.GetType() == typeof(PhpMyDbConnection))
+                connection = (PhpMyDbConnection)handle;
+            else
+                connection = null;
+            
+            if (connection != null && connection.IsValid)
+                return connection;
 			
 			PhpException.Throw(PhpError.Warning, LibResources.GetString("invalid_connection_resource"));
 			return null;
