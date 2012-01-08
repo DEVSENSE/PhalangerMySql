@@ -113,13 +113,17 @@ namespace PHP.Library.Data
 
             var data = new FieldCustomData[my_reader.FieldCount];
 
+            var resultset = MySqlDataReaderHelper.ResultSet(my_reader);
+
             for (int i = 0; i < my_reader.FieldCount; i++)
             {
+                var field = MySqlDataReaderHelper.fields_index(resultset, i);
+
                 data[i] = new FieldCustomData()
                 {
-                    Flags = my_reader.GetFieldFlags(i),
-                    RealTableName = my_reader.GetRealTableName(i),
-                    ColumnSize = my_reader.GetColumnSize(i)
+                    Flags = MySqlDataReaderHelper.colFlags(field), //my_reader.GetFieldFlags(i),
+                    RealTableName = MySqlDataReaderHelper.RealTableName(field), //my_reader.GetRealTableName(i),
+                    ColumnSize = MySqlDataReaderHelper.GetColumnSize(field) //my_reader.GetColumnSize(i)
                 };
             }
 
@@ -227,7 +231,7 @@ namespace PHP.Library.Data
         public ColumnFlags GetFieldFlags(int fieldIndex)
         {
             if (!CheckFieldIndex(fieldIndex)) return 0;
-            return ((MySqlDataReader)Reader).GetFieldFlags(fieldIndex);
+            return MySqlDataReaderHelper.colFlags(MySqlDataReaderHelper.fields_index(MySqlDataReaderHelper.ResultSet((MySqlDataReader)Reader), fieldIndex));  // ((MySqlDataReader)Reader).GetFieldFlags(fieldIndex);
         }
 
         /// <summary>
@@ -239,7 +243,7 @@ namespace PHP.Library.Data
         {
             if (!CheckFieldIndex(fieldIndex)) return null;
 
-            return ((MySqlDataReader)Reader).GetRealTableName(fieldIndex);
+            return MySqlDataReaderHelper.RealTableName(MySqlDataReaderHelper.fields_index(MySqlDataReaderHelper.ResultSet((MySqlDataReader)Reader), fieldIndex));  //((MySqlDataReader)Reader).GetRealTableName(fieldIndex);
         }
 
         /// <summary>

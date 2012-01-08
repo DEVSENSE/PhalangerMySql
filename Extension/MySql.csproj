@@ -96,6 +96,10 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="mysql.data, Version=6.4.4.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\MySql.Data\mysql.data.dll</HintPath>
+    </Reference>
     <Reference Include="PhpNetClassLibrary, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4af37afe3cde05fb, processorArchitecture=MSIL">
     </Reference>
     <Reference Include="PhpNetCore, Version=3.0.0.0, Culture=neutral, PublicKeyToken=0a8e8c4c76728c71, processorArchitecture=MSIL">
@@ -126,6 +130,7 @@
     <Compile Include="MySql.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="MySql.Data.cs" />
     <Compile Include="PhpMyDbConnection.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -163,23 +168,21 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MySql.Data\MySql.Data.csproj">
-      <Project>{C4BBA055-D216-4146-8E37-9F7FAE3392A2}</Project>
-      <Name>MySql.Data</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>"$(SolutionDir)Tools\gacutil" -f -i "$(TargetPath)"
+    <PostBuildEvent>"$(SolutionDir)Tools\gacutil" -f -i "$(TargetPath)\..\mysql.data\mysql.data.dll"
+"$(SolutionDir)Tools\gacutil" -f -i "$(TargetPath)"
 
 if $(ConfigurationName) == Release (
-xcopy /q /y "$(TargetDir)$(TargetName).*" "$(SolutionDir)Deployment\bin" 1&gt;nul
+      xcopy /q /y "$(ProjectDir)..\mysql.data\MySql.Data.dll" "$(SolutionDir)Deployment\Bin" 1&gt;nul
+      xcopy /q /y "$(TargetDir)$(TargetName).*" "$(SolutionDir)Deployment\Bin" 1&gt;nul
 )
+
 if $(ConfigurationName) == Debug (
-xcopy /q /y "$(TargetDir)$(TargetName).*" "$(SolutionDir)Deployment\Debug" 1&gt;nul
+      xcopy /q /y "$(ProjectDir)..\mysql.data\MySql.Data.dll" "$(SolutionDir)Deployment\Debug" 1&gt;nul
+      xcopy /q /y "$(TargetDir)$(TargetName).*" "$(SolutionDir)Deployment\Debug" 1&gt;nul
 )</PostBuildEvent>
   </PropertyGroup>
 </Project>

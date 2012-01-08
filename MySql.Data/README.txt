@@ -1,0 +1,1 @@
+MySql.Data.dll is obtained from http://dev.mysql.com/downloads/connector/net, .NET & Mono platform.
