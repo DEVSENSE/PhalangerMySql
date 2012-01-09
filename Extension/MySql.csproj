@@ -96,9 +96,9 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="mysql.data, Version=6.4.4.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+    <Reference Include="MySql.Data, Version=6.4.4.0, Culture=neutral, PublicKeyToken=2771987119c16a03, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\MySql.Data\mysql.data.dll</HintPath>
+      <HintPath>..\MySql.Data\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="PhpNetClassLibrary, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4af37afe3cde05fb, processorArchitecture=MSIL">
     </Reference>
