@@ -172,7 +172,7 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>"$(SolutionDir)Tools\gacutil" -f -i "$(TargetPath)\..\mysql.data\mysql.data.dll"
+    <PostBuildEvent>"$(SolutionDir)Tools\gacutil" -f -i "$(ProjectDir)\..\MySql.Data\MySql.Data.dll"
 "$(SolutionDir)Tools\gacutil" -f -i "$(TargetPath)"
 
 if $(ConfigurationName) == Release (
