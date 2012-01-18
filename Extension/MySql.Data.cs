@@ -34,7 +34,10 @@ namespace PHP.Library.Data
                 // obtain required field:
                 var fld = argType.GetField(fieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
                 Debug.Assert(fld != null, "!" + fieldName);
-                Debug.Assert(typeof(TResult).IsAssignableFrom(fld.FieldType), fieldName + ".FieldType must be assignable to " + typeof(TResult).Name);
+                Debug.Assert(
+                    typeof(TResult).IsAssignableFrom(fld.FieldType) ||
+                    (fld.FieldType.IsEnum && typeof(TResult).IsAssignableFrom(fld.FieldType.GetEnumUnderlyingType())),
+                    fieldName + ".FieldType must be assignable to " + typeof(TResult).Name);
 
                 // create dynamic method with skipped JIT visibility checks:
                 var getter = new DynamicMethod("get_" + fieldName + "#1", typeof(TResult), new Type[] { typeof(TArg0) }, true);
