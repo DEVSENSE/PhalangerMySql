@@ -100,9 +100,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\MySql.Data\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="PhpNetClassLibrary, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4af37afe3cde05fb, processorArchitecture=MSIL">
+    <Reference Include="PhpNetClassLibrary, Version=0.0.0.0, Culture=neutral, PublicKeyToken=4af37afe3cde05fb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="PhpNetCore, Version=3.0.0.0, Culture=neutral, PublicKeyToken=0a8e8c4c76728c71, processorArchitecture=MSIL">
+    <Reference Include="PhpNetCore, Version=0.0.0.0, Culture=neutral, PublicKeyToken=0a8e8c4c76728c71, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -172,7 +174,9 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>"$(SolutionDir)Tools\gacutil" -f -i "$(ProjectDir)\..\MySql.Data\MySql.Data.dll"
+    <PostBuildEvent>"$(SolutionDir)Tools\gacutil" /u $(TargetName) 1&gt;nul
+
+"$(SolutionDir)Tools\gacutil" -f -i "$(ProjectDir)\..\MySql.Data\MySql.Data.dll"
 "$(SolutionDir)Tools\gacutil" -f -i "$(TargetPath)"
 
 if $(ConfigurationName) == Release (
