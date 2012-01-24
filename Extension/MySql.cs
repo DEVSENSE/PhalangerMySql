@@ -1135,7 +1135,7 @@ namespace PHP.Library.Data
         ColumnFlags flags = data.Flags;//result.GetFieldFlags(fieldIndex);
         
         // create an array of runtime fields with specified capacity:
-        OrderedHashtable<string> objFields = new OrderedHashtable<string>(null, 13);
+        OrderedHashtable<string> objFields = new OrderedHashtable<string>(13);
 
         // add fields into the hastable directly:
         // no duplicity check, since array is already valid
