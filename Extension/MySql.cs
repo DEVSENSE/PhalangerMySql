@@ -15,6 +15,7 @@ using System;
 using System.Data;
 using System.Collections;
 using System.Text;
+using System.Linq;
 using MySql.Data.MySqlClient;
 
 using PHP.Core;
@@ -428,7 +429,7 @@ namespace PHP.Library.Data
         string connection_string = PhpMyDbConnection.BuildConnectionString(
           server, user, password,
 
-          String.Format("allowzerodatetime=true;character set=utf8;allow user variables=true;connect timeout={0};Port={1};SSL Mode={2};Use Compression={3}{4}{5}",
+          String.Format("allowzerodatetime=true;allow user variables=true;connect timeout={0};Port={1};SSL Mode={2};Use Compression={3}{4}{5}",
             (local.ConnectTimeout > 0) ? local.ConnectTimeout : Int32.MaxValue,
             port,
             (flags & ConnectFlags.SSL) != 0 ? "Preferred" : "None",     // (since Connector 6.2.1.) ssl mode={None|Preferred|Required|VerifyCA|VerifyFull}   // (Jakub) use ssl={true|false} has been deprecated
@@ -1647,8 +1648,8 @@ namespace PHP.Library.Data
     }
 		
     #endregion
-		
-    #region mysql_client_encoding
+
+    #region mysql_client_encoding, mysql_set_charset
 
     /// <summary>
     /// Gets the name of the client character set.
@@ -1657,12 +1658,7 @@ namespace PHP.Library.Data
     [ImplementsFunction("mysql_client_encoding")]
     public static string GetClientEncoding()
     {
-      PhpDbConnection last_connection = manager.GetLastConnection();
-
-      if (last_connection == null)
-        last_connection = (PhpDbConnection) Connect();
-
-      return GetClientEncoding(last_connection);
+        return GetClientEncoding(manager.GetLastConnection() ?? (PhpDbConnection)Connect());
     }
 		
     /// <summary>
@@ -1673,13 +1669,58 @@ namespace PHP.Library.Data
     [ImplementsFunction("mysql_client_encoding")]
     public static string GetClientEncoding(PhpResource linkIdentifier)
     {
-      PhpMyDbConnection connection = PhpMyDbConnection.ValidConnection(linkIdentifier);
-      if (connection == null) return null;
-			
-      object value = connection.QueryGlobalVariable("character_set_client");
-      return (value!=null) ? value.ToString() : DefaultClientCharset;
+        PhpMyDbConnection connection = PhpMyDbConnection.ValidConnection(linkIdentifier);
+        if (connection == null) return null;
+
+        object value = connection.QueryGlobalVariable("character_set_client");
+        return (value != null) ? value.ToString() : DefaultClientCharset;
     }
-				
+
+    /// <summary>
+    /// Sets the client character set.
+    /// </summary>
+    /// <param name="charset">New character set. Must be valid SQL character set.</param>
+    /// <returns>True if successful.</returns>
+    [ImplementsFunction("mysql_set_charset")]
+    public static bool SetCharset(string charset)
+    {
+        return SetCharset(charset, manager.GetLastConnection() ?? (PhpDbConnection)Connect());
+    }
+
+    /// <summary>
+    /// Sets the client character set.
+    /// </summary>
+    /// <param name="charset">New character set. Must be valid SQL character set.</param>
+    /// <param name="linkIdentifier">Connection resource.</param>
+    /// <returns>True if successful.</returns>
+    [ImplementsFunction("mysql_set_charset")]
+    public static bool SetCharset(string charset, PhpResource linkIdentifier)
+    {
+        PhpMyDbConnection connection = PhpMyDbConnection.ValidConnection(linkIdentifier);
+        if (connection == null) return false;
+
+        // validate the charset (only a-z, 0-9, _ allowed, see mysqlnd_find_charset_name):
+        if (string.IsNullOrEmpty(charset) ||
+            charset.FirstOrDefault((c) =>
+            {
+                if ((c >= 'a' && c <= 'z') ||
+                    (c >= 'A' && c <= 'Z') ||
+                    (c >= '0' && c <= '9') ||
+                    (c == '_')) return false;
+                return true;    // we've found bad char
+            }) != default(char))
+        {
+            PhpException.InvalidArgument("charset");
+            return false;
+        }
+
+        // set the charset:
+        var result = connection.ExecuteCommand("SET NAMES " + charset, CommandType.Text, false, null, true);
+        if (result != null) result.Dispose();
+
+        // success if there were no errors:
+        return connection.LastException != null;
+    }				
     #endregion
 		
     #region mysql_ping
