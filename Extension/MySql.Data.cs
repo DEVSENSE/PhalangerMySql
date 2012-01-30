@@ -244,18 +244,31 @@ namespace PHP.Library.Data
     /// </summary>
     public enum ColumnFlags
     {
+        /// <summary></summary>
         NOT_NULL = 1,
+        /// <summary></summary>
         PRIMARY_KEY,
+        /// <summary></summary>
         UNIQUE_KEY = 4,
+        /// <summary></summary>
         MULTIPLE_KEY = 8,
+        /// <summary></summary>
         BLOB = 16,
+        /// <summary></summary>
         UNSIGNED = 32,
+        /// <summary></summary>
         ZERO_FILL = 64,
+        /// <summary></summary>
         BINARY = 128,
+        /// <summary></summary>
         ENUM = 256,
+        /// <summary></summary>
         AUTO_INCREMENT = 512,
+        /// <summary></summary>
         TIMESTAMP = 1024,
+        /// <summary></summary>
         SET = 2048,
+        /// <summary></summary>
         NUMBER = 32768
     }
 }
