@@ -17,6 +17,7 @@ using System.Collections;
 using System.Text;
 using System.Linq;
 using MySql.Data.MySqlClient;
+using System.Collections.Generic;
 
 using PHP.Core;
 
@@ -553,7 +554,7 @@ namespace PHP.Library.Data
     /// <returns>Query resource or a <B>null</B> reference (<B>null</B> in PHP) on failure.</returns>
     [ImplementsFunction("mysql_query")]
     [return: CastToFalse]
-    public static PhpResource Query(string query)
+    public static PhpResource Query(object query)
     {
       PhpDbConnection last_connection = manager.GetLastConnection();
 
@@ -571,12 +572,120 @@ namespace PHP.Library.Data
     /// <returns>Query resource or a <B>null</B> reference (<B>null</B> in PHP) on failure.</returns>
     [ImplementsFunction("mysql_query")]
     [return: CastToFalse]
-    public static PhpResource Query(string query, PhpResource linkIdentifier)
+    public static PhpResource Query(object query, PhpResource linkIdentifier)
     {
       PhpMyDbConnection connection = PhpMyDbConnection.ValidConnection(linkIdentifier);
       if (query == null || connection == null) return null;
 
-      return connection.ExecuteQuery(query.Trim(),true);
+        if (query.GetType() == typeof(PhpBytes))
+            return QueryBinary(((PhpBytes)query).ReadonlyData, connection);     // be aware of binary data
+        else
+            return connection.ExecuteQuery(PHP.Core.Convert.ObjectToString(query), true);   // standard unicode behaviour
+    }
+
+      /// <summary>
+    /// Sends a query to the current database associated with a specified connection. Preserves binary characters.
+      /// </summary>
+      /// <param name="query">Query.</param>
+    /// <param name="connection">Connection resource.</param>
+    /// <returns>Query resource or a <B>null</B> reference (<B>null</B> in PHP) on failure.</returns>
+    private static PhpResource QueryBinary(byte[] query, PhpMyDbConnection connection)
+    {
+        Debug.Assert(query != null);
+        Debug.Assert(connection != null && connection.IsValid);
+
+        if (query.Length == 0)
+            return null;
+
+        //
+        var encoding = Configuration.Application.Globalization.PageEncoding;
+
+        //
+        List<IDataParameter> parameters = null;
+        string commandText = null;
+        int commandTextLast = 0;
+
+        // Parse values whether it contains non-ascii characters,
+        // non-encodable values convert to byte[] parameter:
+        int lastQuote = -1;
+        bool escaped = false;
+        bool containsNonAscii = false;
+
+        for (int i = 0; i < query.Length; i++)
+        {
+            byte b = query[i];
+            byte bnext = ((i+1) < query.Length) ? query[i+1] : (byte)0;
+
+            if (b == '\'' || b == '\"')
+            {
+                if (!escaped)
+                {
+                    if (lastQuote >= 0 && containsNonAscii)
+                    {
+                        commandText = string.Concat(commandText, encoding.GetString(query, commandTextLast, lastQuote - commandTextLast));
+                        commandTextLast = i + 1;
+
+                        // param name @paramName
+                        string paramName = string.Concat("_ImplData_", i.ToString());
+
+                        // replace [lastQuote, i] with "@paramName"
+                        // and add parameter @paramName
+                        byte[] value = new byte[i - lastQuote + 1];
+                        Buffer.BlockCopy(query, lastQuote + 1, value, 0, i - lastQuote - 1);
+
+                        //
+                        if (parameters == null) parameters = new List<IDataParameter>(1);
+                        parameters.Add(new MySqlParameter(paramName, value));
+                        commandText += '@' + paramName;
+
+                        lastQuote = -1; // out of quoted value
+                    }
+                    else
+                    {
+                        lastQuote = i;  // start of quoted value
+                    }
+
+                    containsNonAscii = false;
+                }
+            }
+            else if (b == '/' && bnext == '*' && lastQuote < 0) // /* not in quoted value
+            {
+                // /* comment */
+                i += 2;
+                while ((i+1) < query.Length && (query[i] != '*' || query[i+1] != '/'))
+                    i++;    // skip comment
+
+                escaped = false;
+            }
+            else if (   // -- or # not in quoted value
+                (b == '-' && bnext == '-' && lastQuote < 0 && (i+2 < query.Length) && char.IsWhiteSpace((char)query[i+2])) ||
+                (b == '#' && lastQuote < 0))
+            {
+                // single line comment
+                i++;
+                while (i < query.Length && query[i] != '\n')
+                    i++;
+
+                escaped = false;
+            }
+            else if (b > 0x7f && lastQuote >= 0)   // non-ascii character
+            {
+                // this character may not pass:
+                containsNonAscii = true;
+            }
+            else if (b == '\\' && !escaped)
+            {
+                escaped = true;
+            }
+            else
+            {
+                escaped = false;
+            }
+        }
+
+        //
+        commandText = string.Concat(commandText, encoding.GetString(query, commandTextLast, query.Length - commandTextLast));
+        return connection.ExecuteCommand(commandText, CommandType.Text, true, parameters, false);
     }
 
     #endregion
@@ -1205,9 +1314,9 @@ namespace PHP.Library.Data
     /// </summary>
     /// <param name="query">Query string.</param>
     /// <returns>Query result resource.</returns>
-    /// <remarks>Equivalent to <see cref="Query(string)"/> (<c>mysql_query</c> in PHP). Unbuffered queries not supported.</remarks>
+    /// <remarks>Equivalent to <see cref="Query(object)"/> (<c>mysql_query</c> in PHP). Unbuffered queries not supported.</remarks>
     [ImplementsFunction("mysql_unbuffered_query")]
-    public static PhpResource QueryUnbuffered(string query)
+    public static PhpResource QueryUnbuffered(object query)
     {
       PhpDbConnection last_connection = manager.GetLastConnection();
 
@@ -1223,9 +1332,9 @@ namespace PHP.Library.Data
     /// <param name="query">Query string.</param>
     /// <param name="linkIdentifier">Connection resource.</param>
     /// <returns>Query result resource.</returns>
-    /// <remarks>Equivalent to <see cref="Query(string,PhpResource)"/> (<c>mysql_query</c> in PHP). Unbuffered queries not supported.</remarks>
+    /// <remarks>Equivalent to <see cref="Query(object,PhpResource)"/> (<c>mysql_query</c> in PHP). Unbuffered queries not supported.</remarks>
     [ImplementsFunction("mysql_unbuffered_query")]
-    public static PhpResource QueryUnbuffered(string query, PhpResource linkIdentifier)
+    public static PhpResource QueryUnbuffered(object query, PhpResource linkIdentifier)
     {
       return Query(query, linkIdentifier);
     }
@@ -1392,7 +1501,7 @@ namespace PHP.Library.Data
     /// <param name="str">String to escape.</param>
     /// <returns>Escaped string.</returns>
     [ImplementsFunction("mysql_real_escape_string")]
-    public static string RealEscapeString(string str)
+    public static object RealEscapeString(object str)
     {
       PhpDbConnection last_connection = manager.GetLastConnection();
 
@@ -1409,7 +1518,7 @@ namespace PHP.Library.Data
     /// <param name="linkIdentifier">Connection resource.</param>
     /// <returns>Escaped string.</returns>
     [ImplementsFunction("mysql_real_escape_string")]
-    public static string RealEscapeString(string str,PhpResource linkIdentifier)
+    public static object RealEscapeString(object str, PhpResource linkIdentifier)
     {
       PhpMyDbConnection connection = PhpMyDbConnection.ValidConnection(linkIdentifier);
       if (connection == null) return null;
@@ -1420,29 +1529,61 @@ namespace PHP.Library.Data
     /// <summary>
     /// Escapes special characters in a string for use in a SQL statement.
     /// </summary>
-    /// <param name="str">String to escape.</param>
+    /// <param name="strobj">String to escape.</param>
     /// <returns>Escaped string.</returns>
     [ImplementsFunction("mysql_escape_string")]
-    public static string EscapeString(string str)
+    public static object EscapeString(object strobj)
     {
-      StringBuilder sb = new StringBuilder();
-      for(int i=0;i<str.Length;i++)
-      {
-        char c = str[i];
-        switch (c)
+        if (strobj == null)
+            return string.Empty;
+
+        // binary aware:
+        if (strobj.GetType() == typeof(PhpBytes))
         {
-          case '\0': sb.Append(@"\0");break;
-          case '\\': sb.Append(@"\\");break;
-          case '\n': sb.Append(@"\n");break;
-          case '\r': sb.Append(@"\r");break;
-          case '\u001a': sb.Append(@"\Z");break;
-          case '\'': sb.Append(@"\'");break;
-          case '"' : sb.Append("\\\"");break;
-          default: sb.Append(c);break;
+            var strbytes = (PhpBytes)strobj;
+            if (strbytes.Length == 0) return strobj;
+
+            var bytes = strbytes.ReadonlyData;
+            List<byte>/*!*/result = new List<byte>(bytes.Length);
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                switch (bytes[i])
+                {
+                    case (byte)'\0': result.Add((byte)'\\'); goto default;
+                    case (byte)'\\': result.Add((byte)'\\'); goto default;
+                    case (byte)'\n': result.Add((byte)'\\'); result.Add((byte)'n'); break;
+                    case (byte)'\r': result.Add((byte)'\\'); result.Add((byte)'r'); break;
+                    case (byte)'\u001a': result.Add((byte)'\\'); result.Add((byte)'Z'); break;
+                    case (byte)'\'': result.Add((byte)'\\'); goto default;
+                    case (byte)'"': result.Add((byte)'\\'); goto default;
+                    default: result.Add(bytes[i]); break;
+                }
+            }
+
+            return new PhpBytes(result.ToArray());
         }
-      }
-      
-      return sb.ToString();
+
+        // else
+        string str = Core.Convert.ObjectToString(strobj);
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < str.Length; i++)
+        {
+            char c = str[i];
+            switch (c)
+            {
+                case '\0': sb.Append(@"\0"); break;
+                case '\\': sb.Append(@"\\"); break;
+                case '\n': sb.Append(@"\n"); break;
+                case '\r': sb.Append(@"\r"); break;
+                case '\u001a': sb.Append(@"\Z"); break;
+                case '\'': sb.Append(@"\'"); break;
+                case '"': sb.Append("\\\""); break;
+                default: sb.Append(c); break;
+            }
+        }
+
+        return sb.ToString();
     }
     		
     #endregion
