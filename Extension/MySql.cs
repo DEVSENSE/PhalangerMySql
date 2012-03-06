@@ -647,6 +647,8 @@ namespace PHP.Library.Data
 
                     containsNonAscii = false;
                 }
+
+                escaped = false;
             }
             else if (b == '/' && bnext == '*' && lastQuote < 0) // /* not in quoted value
             {
@@ -672,6 +674,7 @@ namespace PHP.Library.Data
             {
                 // this character may not pass:
                 containsNonAscii = true;
+                escaped = false;
             }
             else if (b == '\\' && !escaped)
             {
