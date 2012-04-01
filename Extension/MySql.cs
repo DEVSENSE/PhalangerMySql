@@ -609,7 +609,8 @@ namespace PHP.Library.Data
         // non-encodable values convert to byte[] parameter:
         int lastQuote = -1;
         bool escaped = false;
-        bool containsNonAscii = false;
+        bool containsNonAscii = false;  // whether encosing may corrupt value when storing into BLOB column
+        int escapedChars = 0;    // amount of '\' chars (> 0 means we have to unescape the value)
 
         for (int i = 0; i < query.Length; i++)
         {
@@ -618,8 +619,15 @@ namespace PHP.Library.Data
 
             if (b == '\'' || b == '\"')
             {
-                if (!escaped)
+                if (escaped)
                 {
+                    escaped = false;
+                }
+                else //(!escaped)
+                {
+                    if (lastQuote >= 0 && query[lastQuote] != b)
+                        continue;   // incompatible quotes (should be escaped, but we should handle that)
+
                     if (lastQuote >= 0 && containsNonAscii)
                     {
                         commandText = string.Concat(commandText, encoding.GetString(query, commandTextLast, lastQuote - commandTextLast));
@@ -630,8 +638,17 @@ namespace PHP.Library.Data
 
                         // replace [lastQuote, i] with "@paramName"
                         // and add parameter @paramName
-                        byte[] value = new byte[i - lastQuote + 1];
-                        Buffer.BlockCopy(query, lastQuote + 1, value, 0, i - lastQuote - 1);
+                        byte[] value = new byte[i - lastQuote + 1 - escapedChars];
+                        if (escapedChars == 0)
+                        {
+                            // we can block-copy the value, there are no escaped characters:
+                            Buffer.BlockCopy(query, lastQuote + 1, value, 0, i - lastQuote - 1);
+                        }
+                        else
+                        {
+                            // unescape the value, parameters are assumed to contained raw data, escaping is not desirable:
+                            UnescapeString(query, lastQuote + 1, value);
+                        }
 
                         //
                         if (parameters == null) parameters = new List<IDataParameter>(1);
@@ -643,12 +660,11 @@ namespace PHP.Library.Data
                     else
                     {
                         lastQuote = i;  // start of quoted value
+                        escapedChars = 0;
                     }
 
                     containsNonAscii = false;
                 }
-
-                escaped = false;
             }
             else if (b == '/' && bnext == '*' && lastQuote < 0) // /* not in quoted value
             {
@@ -658,10 +674,12 @@ namespace PHP.Library.Data
                     i++;    // skip comment
 
                 escaped = false;
+                escapedChars = 0;
             }
-            else if (   // -- or # not in quoted value
-                (b == '-' && bnext == '-' && lastQuote < 0 && (i+2 < query.Length) && char.IsWhiteSpace((char)query[i+2])) ||
-                (b == '#' && lastQuote < 0))
+            else if (   // -- or #
+                lastQuote < 0 &&    // not in quoted value
+                (   (b == '-' && bnext == '-' && (i+2 < query.Length) && char.IsWhiteSpace((char)query[i+2])) ||
+                    (b == '#')))
             {
                 // single line comment
                 i++;
@@ -669,6 +687,7 @@ namespace PHP.Library.Data
                     i++;
 
                 escaped = false;
+                escapedChars = 0;
             }
             else if (b > 0x7f && lastQuote >= 0)   // non-ascii character
             {
@@ -676,19 +695,58 @@ namespace PHP.Library.Data
                 containsNonAscii = true;
                 escaped = false;
             }
-            else if (b == '\\' && !escaped)
-            {
-                escaped = true;
-            }
-            else
+            else if (escaped)
             {
                 escaped = false;
+            }
+            else if (b == '\\') // && !escaped)
+            {
+                escapedChars++;
+                escaped = true;
             }
         }
 
         //
         commandText = string.Concat(commandText, encoding.GetString(query, commandTextLast, query.Length - commandTextLast));
         return connection.ExecuteCommand(commandText, CommandType.Text, true, parameters, false);
+    }
+
+      /// <summary>
+      /// Inverse function to <see cref="EscapeString"/>.
+      /// </summary>
+      /// <param name="source">Source byte array containing escaped characters.</param>
+      /// <param name="startFrom">Index of the first character to start unescaping with.</param>
+      /// <param name="dest">Target byte array where unescaped <paramref name="source"/> is copied.</param>
+      /// <remarks>This method unescapes as many characters as <paramref name="dest"/> can hold.</remarks>
+    private static void UnescapeString(byte[]/*!*/source, int startFrom, byte[]/*!*/dest)
+    {
+        Debug.Assert(source != null);
+        Debug.Assert(dest != null);
+        Debug.Assert(startFrom >= 0 && startFrom < source.Length);
+        Debug.Assert(source.Length - startFrom /* - escapedChars */ >= dest.Length);
+
+        int dest_index = 0; // dest write index
+        int source_length = source.Length;
+
+        for (int i = startFrom; dest_index < dest.Length; i++)
+        {
+            byte b = source[i];
+
+            // unescape the character (invert function to EscapeString)
+            if (b == '\\')// && i < source_length - 1)
+            {
+                Debug.Assert(i < source_length - 1);
+
+                b = source[++i];    // next char after the \
+                if (b == 'n') b = (byte)'\n';
+                else if (b == 'n') b = (byte)'\r';
+                else if (b == 'Z') b = (byte)'\u001a';
+                // else: other characters are as they are
+            }
+
+            //
+            dest[dest_index++] = b;
+        }
     }
 
     #endregion
