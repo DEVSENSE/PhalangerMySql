@@ -666,6 +666,15 @@ namespace PHP.Library.Data
                     containsNonAscii = false;
                 }
             }
+            else if (escaped)
+            {
+                escaped = false;
+            }
+            else if (b == '\\') // && !escaped)
+            {
+                escapedChars++;
+                escaped = true;
+            }
             else if (b == '/' && bnext == '*' && lastQuote < 0) // /* not in quoted value
             {
                 // /* comment */
@@ -694,16 +703,7 @@ namespace PHP.Library.Data
                 // this character may not pass:
                 containsNonAscii = true;
                 escaped = false;
-            }
-            else if (escaped)
-            {
-                escaped = false;
-            }
-            else if (b == '\\') // && !escaped)
-            {
-                escapedChars++;
-                escaped = true;
-            }
+            }            
         }
 
         //
@@ -739,7 +739,7 @@ namespace PHP.Library.Data
 
                 b = source[++i];    // next char after the \
                 if (b == 'n') b = (byte)'\n';
-                else if (b == 'n') b = (byte)'\r';
+                else if (b == 'r') b = (byte)'\r';
                 else if (b == 'Z') b = (byte)'\u001a';
                 // else: other characters are as they are
             }
@@ -1180,8 +1180,6 @@ namespace PHP.Library.Data
     }
 		
     #endregion
-		
-		
 		
     #region mysql_field_table, mysql_field_flags, mysql_fetch_field, mysql_fetch_lengths
 
