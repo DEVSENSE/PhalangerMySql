@@ -615,8 +615,7 @@ namespace PHP.Library.Data
         for (int i = 0; i < query.Length; i++)
         {
             byte b = query[i];
-            byte bnext = ((i+1) < query.Length) ? query[i+1] : (byte)0;
-
+            
             if (b == '\'' || b == '\"')
             {
                 if (escaped)
@@ -638,11 +637,11 @@ namespace PHP.Library.Data
 
                         // replace [lastQuote, i] with "@paramName"
                         // and add parameter @paramName
-                        byte[] value = new byte[i - lastQuote + 1 - escapedChars];
+                        byte[] value = new byte[i - lastQuote - 1 - escapedChars];
                         if (escapedChars == 0)
                         {
                             // we can block-copy the value, there are no escaped characters:
-                            Buffer.BlockCopy(query, lastQuote + 1, value, 0, i - lastQuote - 1);
+                            Buffer.BlockCopy(query, lastQuote + 1, value, 0, value.Length);
                         }
                         else
                         {
@@ -666,6 +665,12 @@ namespace PHP.Library.Data
                     containsNonAscii = false;
                 }
             }
+            else if (b > 0x7f && lastQuote >= 0)   // non-ascii character
+            {
+                // this character may not pass:
+                containsNonAscii = true;
+                escaped = false;
+            }
             else if (escaped)
             {
                 escaped = false;
@@ -675,35 +680,29 @@ namespace PHP.Library.Data
                 escapedChars++;
                 escaped = true;
             }
-            else if (b == '/' && bnext == '*' && lastQuote < 0) // /* not in quoted value
+            // handle comments (only outside quoted values):
+            else if (lastQuote < 0)
             {
-                // /* comment */
-                i += 2;
-                while ((i+1) < query.Length && (query[i] != '*' || query[i+1] != '/'))
-                    i++;    // skip comment
-
-                escaped = false;
-                escapedChars = 0;
-            }
-            else if (   // -- or #
-                lastQuote < 0 &&    // not in quoted value
-                (   (b == '-' && bnext == '-' && (i+2 < query.Length) && char.IsWhiteSpace((char)query[i+2])) ||
-                    (b == '#')))
-            {
-                // single line comment
-                i++;
-                while (i < query.Length && query[i] != '\n')
+                // escaped = false
+                // 
+                byte bnext = ((i + 1) < query.Length) ? query[i + 1] : (byte)0;
+                if (b == '/' && bnext == '*') // /*
+                {
+                    // /* comment */
+                    i += 2;
+                    while ((i + 1) < query.Length && (query[i] != '*' || query[i + 1] != '/'))
+                        i++;    // skip comment
+                }
+                else if (   // -- or #
+                    (b == '-' && bnext == '-' && (i + 2 < query.Length) && char.IsWhiteSpace((char)query[i + 2])) ||
+                    (b == '#'))
+                {
+                    // single line comment
                     i++;
-
-                escaped = false;
-                escapedChars = 0;
+                    while (i < query.Length && query[i] != '\n')
+                        i++;
+                }
             }
-            else if (b > 0x7f && lastQuote >= 0)   // non-ascii character
-            {
-                // this character may not pass:
-                containsNonAscii = true;
-                escaped = false;
-            }            
         }
 
         //
