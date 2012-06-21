@@ -437,14 +437,15 @@ namespace PHP.Library.Data
             string connection_string = PhpMyDbConnection.BuildConnectionString(
               server, user, password,
 
-              String.Format("allowzerodatetime=true;allow user variables=true;connect timeout={0};Port={1};SSL Mode={2};Use Compression={3}{4}{5};Max Pool Size={6}",
+              String.Format("allowzerodatetime=true;allow user variables=true;connect timeout={0};Port={1};SSL Mode={2};Use Compression={3}{4}{5};Max Pool Size={6}{7}",
                 (local.ConnectTimeout > 0) ? local.ConnectTimeout : Int32.MaxValue,
                 port,
                 (flags & ConnectFlags.SSL) != 0 ? "Preferred" : "None",     // (since Connector 6.2.1.) ssl mode={None|Preferred|Required|VerifyCA|VerifyFull}   // (Jakub) use ssl={true|false} has been deprecated
                 (flags & ConnectFlags.Compress) != 0 ? "true" : "false",    // Use Compression={true|false}
-                (pipe_name != null) ? ";Pipe=" + pipe_name : string.Empty,  // Pipe={...}
-                (flags & ConnectFlags.Interactive) != 0 ? ";Interactive=true" : string.Empty,    // Interactive={true|false}
-                global.MaxPoolSize                                          // Max Pool Size=100
+                (pipe_name != null) ? ";Pipe=" + pipe_name : null,  // Pipe={...}
+                (flags & ConnectFlags.Interactive) != 0 ? ";Interactive=true" : null,    // Interactive={true|false}
+                global.MaxPoolSize,                                          // Max Pool Size=100
+                (global.DefaultCommandTimeout > 0) ? ";DefaultCommandTimeout=" + global.DefaultCommandTimeout : null
                 )
             );
 
