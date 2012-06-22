@@ -445,7 +445,7 @@ namespace PHP.Library.Data
                 (pipe_name != null) ? ";Pipe=" + pipe_name : null,  // Pipe={...}
                 (flags & ConnectFlags.Interactive) != 0 ? ";Interactive=true" : null,    // Interactive={true|false}
                 global.MaxPoolSize,                                          // Max Pool Size=100
-                (global.DefaultCommandTimeout > 0) ? ";DefaultCommandTimeout=" + global.DefaultCommandTimeout : null
+                (global.DefaultCommandTimeout >= 0) ? ";DefaultCommandTimeout=" + global.DefaultCommandTimeout : null
                 )
             );
 
