@@ -99,6 +99,7 @@
     <Reference Include="MySql.Data, Version=6.4.4.0, Culture=neutral, PublicKeyToken=2771987119c16a03, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\MySql.Data\MySql.Data.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="PhpNetClassLibrary, Version=0.0.0.0, Culture=neutral, PublicKeyToken=4af37afe3cde05fb, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
