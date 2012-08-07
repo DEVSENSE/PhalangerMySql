@@ -57,6 +57,11 @@ namespace PHP.Library.Data
         public string Password = null;
 
         /// <summary>
+        /// Command timeout, in seconds.
+        /// </summary>
+        public int DefaultCommandTimeout = -1;
+
+        /// <summary>
         /// Creates a deep copy of the configuration record.
         /// </summary>
         /// <returns>The copy.</returns>
@@ -92,6 +97,10 @@ namespace PHP.Library.Data
                     Password = value;
                     break;
 
+                case "DefaultCommandTimeout":
+                    this.DefaultCommandTimeout = ConfigUtils.ParseInteger(value, 0, Int32.MaxValue, node);
+                    break;
+
                 default:
                     return false;
             }
@@ -122,11 +131,6 @@ namespace PHP.Library.Data
         public int MaxPoolSize = 100;
 
         /// <summary>
-        /// Command timeout, in seconds.
-        /// </summary>
-        public int DefaultCommandTimeout = -1;
-
-        /// <summary>
         /// Parses XML configuration file.
         /// </summary>
         public bool Parse(string name, string value, XmlNode node)
@@ -135,9 +139,6 @@ namespace PHP.Library.Data
             {
                 case "MaxConnections":
                     this.MaxConnections = ConfigUtils.ParseInteger(value, Int32.MinValue, Int32.MaxValue, node);
-                    break;
-                case "DefaultCommandTimeout":
-                    this.DefaultCommandTimeout = ConfigUtils.ParseInteger(value, 0, Int32.MaxValue, node);
                     break;
                 case "MaxPoolSize":
                     this.MaxPoolSize = ConfigUtils.ParseInteger(value, 1, Int32.MaxValue, node);
@@ -187,6 +188,7 @@ namespace PHP.Library.Data
                 case "mysql.default_host": return PhpIni.GSR(ref local.Server, @default.Server, value, action);
                 case "mysql.default_user": return PhpIni.GSR(ref local.User, @default.User, value, action);
                 case "mysql.default_password": return PhpIni.GSR(ref local.Password, @default.Password, value, action);
+                case "mysql.default_command_timeout": return PhpIni.GSR(ref local.DefaultCommandTimeout, @default.DefaultCommandTimeout, value, action);
 
                 // global:
 
