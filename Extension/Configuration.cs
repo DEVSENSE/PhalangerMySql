@@ -226,7 +226,7 @@ namespace PHP.Library.Data
             ow.WriteOption("mysql.default_host", "Server", null, local.Server);
             ow.WriteOption("mysql.default_user", "User", null, local.User);
             ow.WriteOption("mysql.default_password", "Password", null, local.Password);
-            ow.WriteOption("mysql.connect_timeout", "ConnectTimeout", 0, local.ConnectTimeout);
+            ow.WriteOption("mysql.default_command_timeout", "ConnectTimeout", 0, local.ConnectTimeout);
 
             // global:
             ow.WriteOption("mysql.max_links", "MaxConnections", -1, global.MaxConnections);
@@ -250,6 +250,7 @@ namespace PHP.Library.Data
             IniOptions.Register("mysql.default_user", IniFlags.Supported | IniFlags.Local, d, s);
             IniOptions.Register("mysql.default_password", IniFlags.Supported | IniFlags.Local, d, s);
             IniOptions.Register("mysql.connect_timeout", IniFlags.Supported | IniFlags.Local, d, s);
+            IniOptions.Register("mysql.default_command_timeout", IniFlags.Supported | IniFlags.Local, d, s);
 
             // global:
             IniOptions.Register("mysql.allow_persistent", IniFlags.Unsupported | IniFlags.Global, d, s);
