@@ -226,7 +226,8 @@ namespace PHP.Library.Data
             ow.WriteOption("mysql.default_host", "Server", null, local.Server);
             ow.WriteOption("mysql.default_user", "User", null, local.User);
             ow.WriteOption("mysql.default_password", "Password", null, local.Password);
-            ow.WriteOption("mysql.default_command_timeout", "ConnectTimeout", 0, local.ConnectTimeout);
+            ow.WriteOption("mysql.connect_timeout", "ConnectTimeout", 0, local.ConnectTimeout);
+            ow.WriteOption("mysql.default_command_timeout", "DefaultCommandTimeout", 0, local.DefaultCommandTimeout);
 
             // global:
             ow.WriteOption("mysql.max_links", "MaxConnections", -1, global.MaxConnections);
