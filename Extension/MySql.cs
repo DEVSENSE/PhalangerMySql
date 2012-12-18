@@ -420,34 +420,7 @@ namespace PHP.Library.Data
             MySqlLocalConfig local = MySqlConfiguration.Local;
             MySqlGlobalConfig global = MySqlConfiguration.Global;
 
-            string pipe_name = null;
-            int port = -1;
-
-            if (server != null)
-                ParseServerName(ref server, out port, out pipe_name);
-            else
-                server = local.Server;
-
-            if (port == -1) port = local.Port;
-            if (user == null) user = local.User;
-            if (password == null) password = local.Password;
-
-            // build the connection string to be used with MySQL Connector/.NET
-            // see http://dev.mysql.com/doc/refman/5.5/en/connector-net-connection-options.html
-            string connection_string = PhpMyDbConnection.BuildConnectionString(
-              server, user, password,
-
-              String.Format("allowzerodatetime=true;allow user variables=true;connect timeout={0};Port={1};SSL Mode={2};Use Compression={3}{4}{5};Max Pool Size={6}{7}",
-                (local.ConnectTimeout > 0) ? local.ConnectTimeout : Int32.MaxValue,
-                port,
-                (flags & ConnectFlags.SSL) != 0 ? "Preferred" : "None",     // (since Connector 6.2.1.) ssl mode={None|Preferred|Required|VerifyCA|VerifyFull}   // (Jakub) use ssl={true|false} has been deprecated
-                (flags & ConnectFlags.Compress) != 0 ? "true" : "false",    // Use Compression={true|false}
-                (pipe_name != null) ? ";Pipe=" + pipe_name : null,  // Pipe={...}
-                (flags & ConnectFlags.Interactive) != 0 ? ";Interactive=true" : null,    // Interactive={true|false}
-                global.MaxPoolSize,                                          // Max Pool Size=100
-                (local.DefaultCommandTimeout >= 0) ? ";DefaultCommandTimeout=" + local.DefaultCommandTimeout : null
-                )
-            );
+            string connection_string = BuildConnectionString(local, global, server, user, password, flags);
 
             bool success;
             PhpMyDbConnection connection = (PhpMyDbConnection)manager.OpenConnection(connection_string,
@@ -465,6 +438,45 @@ namespace PHP.Library.Data
 
             connection.SetServer(server);
             return connection;
+        }
+
+        private static string BuildConnectionString(MySqlLocalConfig local, MySqlGlobalConfig global, string server, string user, string password, ConnectFlags flags)
+        {
+            // connection strings:
+            if (server == null && user == null && password == null && flags == ConnectFlags.None && !string.IsNullOrEmpty(global.ConnectionString))
+                return global.ConnectionString;
+
+            // TODO: local.ConnectionStringName
+
+            // build connection string:
+            string pipe_name = null;
+            int port = -1;
+
+            if (server != null)
+                ParseServerName(ref server, out port, out pipe_name);
+            else
+                server = local.Server;
+
+            if (port == -1) port = local.Port;
+            if (user == null) user = local.User;
+            if (password == null) password = local.Password;
+
+            // build the connection string to be used with MySQL Connector/.NET
+            // see http://dev.mysql.com/doc/refman/5.5/en/connector-net-connection-options.html
+            return PhpMyDbConnection.BuildConnectionString(
+              server, user, password,
+
+              String.Format("allowzerodatetime=true;allow user variables=true;connect timeout={0};Port={1};SSL Mode={2};Use Compression={3}{4}{5};Max Pool Size={6}{7}",
+                (local.ConnectTimeout > 0) ? local.ConnectTimeout : Int32.MaxValue,
+                port,
+                (flags & ConnectFlags.SSL) != 0 ? "Preferred" : "None",     // (since Connector 6.2.1.) ssl mode={None|Preferred|Required|VerifyCA|VerifyFull}   // (Jakub) use ssl={true|false} has been deprecated
+                (flags & ConnectFlags.Compress) != 0 ? "true" : "false",    // Use Compression={true|false}
+                (pipe_name != null) ? ";Pipe=" + pipe_name : null,  // Pipe={...}
+                (flags & ConnectFlags.Interactive) != 0 ? ";Interactive=true" : null,    // Interactive={true|false}
+                global.MaxPoolSize,                                          // Max Pool Size=100
+                (local.DefaultCommandTimeout >= 0) ? ";DefaultCommandTimeout=" + local.DefaultCommandTimeout : null
+                )
+            );
         }
 
         private static void ParseServerName(ref string/*!*/ server, out int port, out string socketPath)

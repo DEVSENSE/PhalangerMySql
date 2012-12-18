@@ -131,6 +131,11 @@ namespace PHP.Library.Data
         public int MaxPoolSize = 100;
 
         /// <summary>
+        /// If not <c>null</c> reference, this connection string is used by parameterless <c>mysql_connect()</c> function call as MySql Connector/.NET connection string.
+        /// </summary>
+        public string ConnectionString = null;
+
+        /// <summary>
         /// Parses XML configuration file.
         /// </summary>
         public bool Parse(string name, string value, XmlNode node)
@@ -142,6 +147,9 @@ namespace PHP.Library.Data
                     break;
                 case "MaxPoolSize":
                     this.MaxPoolSize = ConfigUtils.ParseInteger(value, 1, Int32.MaxValue, node);
+                    break;
+                case "ConnectionString":
+                    this.ConnectionString = string.IsNullOrEmpty(value) ? null : value;
                     break;
                 default:
                     return false;
@@ -195,6 +203,10 @@ namespace PHP.Library.Data
                 case "mysql.max_links":
                     Debug.Assert(action == IniAction.Get);
                     return PhpIni.GSR(ref global.MaxConnections, -1, null, action);
+                case "mysql.max_pool_size":
+                    return PhpIni.GSR(ref global.MaxPoolSize, 100, value, action);
+                case "mysql.connection_string":
+                    return PhpIni.GSR(ref global.ConnectionString, null, value, action);
             }
 
             Debug.Fail("Option '" + option + "' is supported but not implemented.");
@@ -257,6 +269,8 @@ namespace PHP.Library.Data
             IniOptions.Register("mysql.allow_persistent", IniFlags.Unsupported | IniFlags.Global, d, s);
             IniOptions.Register("mysql.max_persistent", IniFlags.Unsupported | IniFlags.Global, d, s);
             IniOptions.Register("mysql.max_links", IniFlags.Supported | IniFlags.Global, d, s);
+            IniOptions.Register("mysql.max_pool_size", IniFlags.Supported | IniFlags.Global, d, s);
+            IniOptions.Register("mysql.connection_string", IniFlags.Supported | IniFlags.Global, d, s);
         }
 
         #endregion
