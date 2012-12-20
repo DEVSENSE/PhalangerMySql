@@ -443,8 +443,8 @@ namespace PHP.Library.Data
         private static string BuildConnectionString(MySqlLocalConfig local, MySqlGlobalConfig global, string server, string user, string password, ConnectFlags flags)
         {
             // connection strings:
-            if (server == null && user == null && password == null && flags == ConnectFlags.None && !string.IsNullOrEmpty(global.ConnectionString))
-                return global.ConnectionString;
+            if (server == null && user == null && password == null && flags == ConnectFlags.None && !string.IsNullOrEmpty(local.ConnectionString))
+                return local.ConnectionString;
 
             // TODO: local.ConnectionStringName
 

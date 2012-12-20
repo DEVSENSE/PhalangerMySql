@@ -62,6 +62,11 @@ namespace PHP.Library.Data
         public int DefaultCommandTimeout = -1;
 
         /// <summary>
+        /// If not <c>null</c> reference, this connection string is used by parameterless <c>mysql_connect()</c> function call as MySql Connector/.NET connection string.
+        /// </summary>
+        public string ConnectionString = null;
+
+        /// <summary>
         /// Creates a deep copy of the configuration record.
         /// </summary>
         /// <returns>The copy.</returns>
@@ -101,6 +106,10 @@ namespace PHP.Library.Data
                     this.DefaultCommandTimeout = ConfigUtils.ParseInteger(value, 0, Int32.MaxValue, node);
                     break;
 
+                case "ConnectionString":
+                    this.ConnectionString = string.IsNullOrEmpty(value) ? null : value;
+                    break;
+
                 default:
                     return false;
             }
@@ -131,11 +140,6 @@ namespace PHP.Library.Data
         public int MaxPoolSize = 100;
 
         /// <summary>
-        /// If not <c>null</c> reference, this connection string is used by parameterless <c>mysql_connect()</c> function call as MySql Connector/.NET connection string.
-        /// </summary>
-        public string ConnectionString = null;
-
-        /// <summary>
         /// Parses XML configuration file.
         /// </summary>
         public bool Parse(string name, string value, XmlNode node)
@@ -147,9 +151,6 @@ namespace PHP.Library.Data
                     break;
                 case "MaxPoolSize":
                     this.MaxPoolSize = ConfigUtils.ParseInteger(value, 1, Int32.MaxValue, node);
-                    break;
-                case "ConnectionString":
-                    this.ConnectionString = string.IsNullOrEmpty(value) ? null : value;
                     break;
                 default:
                     return false;
@@ -197,6 +198,7 @@ namespace PHP.Library.Data
                 case "mysql.default_user": return PhpIni.GSR(ref local.User, @default.User, value, action);
                 case "mysql.default_password": return PhpIni.GSR(ref local.Password, @default.Password, value, action);
                 case "mysql.default_command_timeout": return PhpIni.GSR(ref local.DefaultCommandTimeout, @default.DefaultCommandTimeout, value, action);
+                case "mysql.connection_string": return PhpIni.GSR(ref local.ConnectionString, null, value, action);
 
                 // global:
 
@@ -205,8 +207,6 @@ namespace PHP.Library.Data
                     return PhpIni.GSR(ref global.MaxConnections, -1, null, action);
                 case "mysql.max_pool_size":
                     return PhpIni.GSR(ref global.MaxPoolSize, 100, value, action);
-                case "mysql.connection_string":
-                    return PhpIni.GSR(ref global.ConnectionString, null, value, action);
             }
 
             Debug.Fail("Option '" + option + "' is supported but not implemented.");
@@ -264,13 +264,13 @@ namespace PHP.Library.Data
             IniOptions.Register("mysql.default_password", IniFlags.Supported | IniFlags.Local, d, s);
             IniOptions.Register("mysql.connect_timeout", IniFlags.Supported | IniFlags.Local, d, s);
             IniOptions.Register("mysql.default_command_timeout", IniFlags.Supported | IniFlags.Local, d, s);
+            IniOptions.Register("mysql.connection_string", IniFlags.Supported | IniFlags.Local, d, s);
 
             // global:
             IniOptions.Register("mysql.allow_persistent", IniFlags.Unsupported | IniFlags.Global, d, s);
             IniOptions.Register("mysql.max_persistent", IniFlags.Unsupported | IniFlags.Global, d, s);
             IniOptions.Register("mysql.max_links", IniFlags.Supported | IniFlags.Global, d, s);
             IniOptions.Register("mysql.max_pool_size", IniFlags.Supported | IniFlags.Global, d, s);
-            IniOptions.Register("mysql.connection_string", IniFlags.Supported | IniFlags.Global, d, s);
         }
 
         #endregion
