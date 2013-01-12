@@ -84,17 +84,18 @@ namespace PHP.Library.Data
             MySqlDataReader my_reader = (MySqlDataReader)Reader;
 
             object[] oa = new object[my_reader.FieldCount];
-
+            
             if (convertTypes)
             {
-                for (int i = 0; i < Reader.FieldCount; i++)
+                Debug.Assert(dataTypes.Length >= oa.Length);
+                for (int i = 0; i < oa.Length; i++)
                 {
                     oa[i] = ConvertDbValue(dataTypes[i], my_reader.GetValue(i));
                 }
             }
             else
             {
-                for (int i = 0; i < Reader.FieldCount; i++)
+                for (int i = 0; i < oa.Length; i++)
                 {
                     oa[i] = my_reader.GetValue(i);
                 }
@@ -136,7 +137,7 @@ namespace PHP.Library.Data
         /// <param name="dataType">MySQL DB data type.</param>
         /// <param name="sqlValue">The value.</param>
         /// <returns>PHP value.</returns>
-        private object ConvertDbValue(string dataType, object sqlValue)
+        private static object ConvertDbValue(string dataType, object sqlValue)
         {
             if (sqlValue == null || sqlValue.GetType() == typeof(string))
                 return sqlValue;
@@ -206,7 +207,7 @@ namespace PHP.Library.Data
             return sqlValue.ToString();
         }
 
-        private string ConvertDateTime(string dataType, DateTime value)
+        private static string ConvertDateTime(string dataType, DateTime value)
         {
             if (dataType == "DATE" || dataType == "NEWDATE")
                 return value.ToString("yyyy-MM-dd");
