@@ -3,15 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MySql", "Extension\MySql.csproj", "{D3C83649-9B7F-46BF-9984-FFDE06C7C2DD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PDOMySQL", "PDOMySQL\PDOMySQL.csproj", "{97CEC9F9-ED05-4093-BF1E-01FB75D7014C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{8594FFEF-EA68-47AF-9642-E46861540535}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.txt = LICENSE.txt
+		README.txt = README.txt
+		MySql.Data\README.txt = MySql.Data\README.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 2
+		SccNumberOfProjects = 3
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://team.corp.devsense.com:8443/tfs/projects
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = Extension\\MySql.csproj
 		SccProjectName1 = Extension
 		SccLocalPath1 = Extension
+		SccProjectUniqueName2 = PDOMySQL\\PDOMySQL.csproj
+		SccProjectName2 = PDOMySQL
+		SccLocalPath2 = PDOMySQL
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,6 +34,10 @@ Global
 		{D3C83649-9B7F-46BF-9984-FFDE06C7C2DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3C83649-9B7F-46BF-9984-FFDE06C7C2DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3C83649-9B7F-46BF-9984-FFDE06C7C2DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97CEC9F9-ED05-4093-BF1E-01FB75D7014C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97CEC9F9-ED05-4093-BF1E-01FB75D7014C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97CEC9F9-ED05-4093-BF1E-01FB75D7014C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97CEC9F9-ED05-4093-BF1E-01FB75D7014C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
