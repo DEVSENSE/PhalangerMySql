@@ -7,6 +7,7 @@ using System.IO;
 using System.Data;
 using MySql.Data.MySqlClient;
 using MySql.Data.Types;
+using System.Diagnostics;
 
 namespace PHP.Library.Data
 {
@@ -76,6 +77,7 @@ namespace PHP.Library.Data
             return con;
         }
 
+        /// <summary>Converts DB value to PHP value.</summary>
         public override object ConvertDbValue(object sqlValue, string dataType)
         {
             if (sqlValue != null && sqlValue.GetType() == typeof(MySqlDateTime))
@@ -118,7 +120,7 @@ namespace PHP.Library.Data
             }
             else
             {
-                Debug.Fail();
+                Debug.Fail(null);
                 return String.Empty;
             }
         }

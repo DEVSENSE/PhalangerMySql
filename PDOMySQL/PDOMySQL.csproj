@@ -48,17 +48,21 @@
       <HintPath>..\MySql\MySql.Data\MySql.Data.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PhpNetClassLibrary, Version=3.0.0.0, Culture=neutral, PublicKeyToken=4af37afe3cde05fb, processorArchitecture=MSIL">
+    <Reference Include="PhpNetClassLibrary, Version=4.0.0.0, Culture=neutral, PublicKeyToken=4af37afe3cde05fb, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>c:\Windows\Microsoft.NET\assembly\GAC_MSIL\PhpNetClassLibrary\v4.0_3.0.0.0__4af37afe3cde05fb\PhpNetClassLibrary.dll</HintPath>
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\PhpNetClassLibrary\v4.0_4.0.0.0__4af37afe3cde05fb\PhpNetClassLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="PhpNetCore, Version=3.0.0.0, Culture=neutral, PublicKeyToken=0a8e8c4c76728c71, processorArchitecture=MSIL">
+    <Reference Include="PhpNetCore, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0a8e8c4c76728c71, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>c:\Windows\Microsoft.NET\assembly\GAC_MSIL\PhpNetCore\v4.0_3.0.0.0__0a8e8c4c76728c71\PhpNetCore.dll</HintPath>
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\PhpNetCore\v4.0_4.0.0.0__0a8e8c4c76728c71\PhpNetCore.dll</HintPath>
     </Reference>
-    <Reference Include="PhpNetPDO, Version=3.0.0.0, Culture=neutral, PublicKeyToken=2771987119c16a03, processorArchitecture=MSIL">
+    <Reference Include="PhpNetCore.Parsers, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0a8e8c4c76728c71, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>c:\Windows\Microsoft.NET\assembly\GAC_MSIL\PhpNetPDO\v4.0_3.0.0.0__2771987119c16a03\PhpNetPDO.dll</HintPath>
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\PhpNetCore.Parsers\v4.0_4.0.0.0__0a8e8c4c76728c71\PhpNetCore.Parsers.dll</HintPath>
+    </Reference>
+    <Reference Include="PhpNetPDO, Version=4.0.0.0, Culture=neutral, PublicKeyToken=2771987119c16a03, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\PhpNetPDO\v4.0_4.0.0.0__2771987119c16a03\PhpNetPDO.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

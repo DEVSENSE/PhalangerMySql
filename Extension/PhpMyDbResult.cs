@@ -22,6 +22,7 @@ using MySql.Data.MySqlClient;
 using MySql.Data.Types;
 
 using PHP.Core;
+using System.Diagnostics;
 
 namespace PHP.Library.Data
 {
