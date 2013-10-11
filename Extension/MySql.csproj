@@ -107,6 +107,10 @@
     <Reference Include="PhpNetCore, Version=0.0.0.0, Culture=neutral, PublicKeyToken=0a8e8c4c76728c71, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="PhpNetCore.Parsers, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0a8e8c4c76728c71, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\PhpNetCore.Parsers\v4.0_4.0.0.0__0a8e8c4c76728c71\PhpNetCore.Parsers.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
