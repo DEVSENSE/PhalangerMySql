@@ -8,7 +8,6 @@
 *.suo
 *.user
 *.sln.docstates
-*.vscct
 
 # Build results
 *_i.c
